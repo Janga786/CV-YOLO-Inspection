@@ -1,0 +1,9 @@
+{
+  "damaged_cans": "damaged_cans_dataset/damaged_cans",
+  "defect_overlays": {
+    "scratches": "damaged_cans_dataset/defect_overlays/scratches",
+    "dents": "damaged_cans_dataset/defect_overlays/dents",
+    "holes": "damaged_cans_dataset/defect_overlays/holes"
+  },
+  "notes": "Add transparent PNG overlays to the defect directories"
+}

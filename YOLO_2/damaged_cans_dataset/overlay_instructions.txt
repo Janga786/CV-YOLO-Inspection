@@ -1,0 +1,51 @@
+
+# Defect Overlay Instructions
+
+To create realistic defect overlays, you need transparent PNG images. Here are the best sources:
+
+## 1. Free PNG Websites (Manual Download)
+- **PNGTree**: https://pngtree.com/ (search for "scratch png", "metal damage png")
+- **FreePNG**: https://freepng.com/ (search for "scratch overlay", "hole png")
+- **PNGWing**: https://www.pngwing.com/ (search for "damage texture")
+- **CleanPNG**: https://www.cleanpng.com/ (various damage effects)
+
+## 2. Create Your Own Overlays
+Using GIMP or Photoshop:
+1. Find high-contrast damage photos
+2. Convert to grayscale
+3. Adjust levels to make damage pure black/white
+4. Delete white background (make transparent)
+5. Save as PNG with alpha channel
+
+## 3. Texture Resources
+- **Textures.com**: https://www.textures.com/ (formerly CGTextures)
+- **Poliigon**: https://www.poliigon.com/ (professional textures)
+- **TextureHaven**: https://texturehaven.com/ (free PBR textures)
+
+## 4. Search Terms for Best Results
+### Scratches:
+- "metal scratch alpha map"
+- "scratch brush png transparent"
+- "grunge scratch overlay"
+
+### Dents:
+- "impact damage normal map"
+- "dent displacement map"
+- "metal deformation texture"
+
+### Holes/Punctures:
+- "bullet hole transparent png"
+- "torn metal alpha"
+- "puncture wound overlay"
+
+## 5. Processing Tips
+- Overlays should be mostly transparent with defects in black/dark gray
+- Higher resolution (2K-4K) works better for detail
+- Multiple variations of each defect type improve realism
+- Consider rotation and scaling when applying
+
+## Directory Structure
+Place downloaded overlays in:
+- damaged_cans_dataset/defect_overlays/scratches
+- damaged_cans_dataset/defect_overlays/dents  
+- damaged_cans_dataset/defect_overlays/holes

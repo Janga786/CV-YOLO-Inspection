@@ -1,0 +1,12 @@
+# YOLOv8 Coke Can Defect Detection Dataset
+
+# Train/val/test sets
+train: /home/janga/YOLO_2/defect_dataset/images
+val: /home/janga/YOLO_2/defect_dataset/images
+
+# Classes
+nc: 4  # number of classes
+names: ['can', 'scratch', 'dent', 'puncture']
+
+# Dataset information
+description: Synthetic Coca-Cola can defect detection dataset with realistic defects

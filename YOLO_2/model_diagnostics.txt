@@ -1,0 +1,13 @@
+COCA-COLA CAN MODEL DIAGNOSTICS
+============================================================
+
+Model file: source/Coke Can.fbx
+Total objects: 1
+Mesh objects: 1
+
+Object details:
+
+- pCylinder13 (MESH)
+  Vertices: 1693
+  Materials: 2
+  Size: 2.438 x 2.438
