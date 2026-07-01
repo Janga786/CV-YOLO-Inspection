@@ -96,3 +96,7 @@ hdri_backgrounds/*.exr
 *.tmp
 *.temp
 *.bak
+
+# Tracked exceptions to the ignore rules above
+!models/trained_model.zip
+!docs/images/*.jpg

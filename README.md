@@ -1,243 +1,128 @@
-# 🔍 Inspection Computer Vision
+# CV-YOLO-Inspection
 
-Advanced YOLO-based computer vision system for automated inspection and defect detection using synthetic data generation and deep learning.
+Synthetic-data pipeline and YOLO training workflow for automated visual inspection of beverage cans.
 
-## 🚀 Overview
+This project builds an end-to-end computer vision workflow for detecting cans and surface defects (scratches, dents, punctures) without hand-labeling a large real-world dataset. Photorealistic training images are generated in Blender from 3D can models, composited over varied backgrounds, and rendered with automatically generated YOLO-format bounding-box labels. The resulting datasets are used to train Ultralytics YOLO detectors, complemented by a convolutional autoencoder for unsupervised anomaly detection. The pipeline was developed as the perception component for a robotic inspection workflow, where a camera-equipped arm examines products and flags defective units.
 
-This project implements a comprehensive computer vision pipeline for industrial inspection using:
+![Training batch of synthetic can images](docs/images/train_batch0.jpg)
 
-- **YOLO Object Detection** - Custom trained models for defect detection
-- **Synthetic Data Generation** - Blender-based automated dataset creation
-- **Deep Learning Pipeline** - Autoencoder and anomaly detection
-- **Multi-modal Training** - Real + synthetic data fusion
+*A training batch from the bundled model run: Blender-rendered cans composited onto varied real backgrounds, with mosaic augmentation applied by the Ultralytics trainer.*
 
-## 📁 Project Structure
+## Pipeline
+
+1. **3D assets** — Can meshes in FBX format (`YOLO_2/source/Coke Can.fbx`, `YOLO_2/Synthetic_coke_pepsi.fbx`) with PBR texture support (base color, normal, metallic, roughness).
+2. **Background sourcing** — Scripts that pull Creative Commons background imagery from Flickr and Openverse (`flickr_image_finder*.py`, `openverse_image_finder.py`, `cc_image_finder*.py`, `download_backgrounds.py`), plus optional HDRI environments.
+3. **Synthetic rendering** — Headless Blender scripts (`enhanced_generator.py`, `enhanced_generator_v282.py`, `generate_detector_data.py`) that randomize camera position, focal length, three-point lighting, and materials; simulate scratch, dent, and puncture defects at configurable probabilities; and write YOLO labels for every render. `known_good_config.json` holds a validated render configuration.
+4. **Quality validation and analysis** — `dataset_analyzer.py`, `check_images.py`, and `diagnose_model.py` validate bounding boxes, image quality, and class distribution before training.
+5. **Detector training** — Datasets are exported in Ultralytics format (see `YOLO_2/defect_dataset/data.yaml`, classes: `can`, `scratch`, `dent`, `puncture`) and trained with Ultralytics YOLO. The bundled model was trained on Google Colab (`train_autoencoder_colab.py` covers the autoencoder equivalent).
+6. **Anomaly detection** — A TensorFlow/Keras convolutional autoencoder (`train_autoencoder.py`) is trained on pristine renders so that defective cans can also be flagged by reconstruction error, independent of the detector's class list. Trained weights live in `YOLO_2/autoencoder_model/`.
+
+## Repository layout
 
 ```
-Inspection-Computer-Vision/
-├── YOLO/                           # YOLO v1 Implementation
-│   ├── apply_texture.py           # Texture application utilities
-│   ├── background_generator.py    # Background generation
-│   ├── generate_blender.py        # Blender automation scripts
-│   ├── models/                    # 3D models and textures
-│   ├── backgrounds/               # Background images
-│   └── requirements.txt          # Dependencies
-├── YOLO_2/                        # Enhanced YOLO Implementation
-│   ├── README_ENHANCED_SYSTEM.md  # Detailed system documentation
-│   ├── enhanced_generator.py      # Advanced synthetic generation
-│   ├── autoencoder_model/         # Trained autoencoder models
-│   ├── hdri_backgrounds/          # HDRI background library
-│   ├── synthetic_dataset/         # Generated training data
-│   └── yolo_cae/                  # YOLO + Autoencoder integration
-└── YOLO_Model_Demo.mp4            # System demonstration video
+CV-YOLO-Inspection/
+├── YOLO_2/                          # Main pipeline
+│   ├── enhanced_generator.py        # Blender generation engine (Cycles)
+│   ├── enhanced_generator_v282.py   # Blender 2.82-compatible engine
+│   ├── generate_detector_data.py    # Render + auto-label driver
+│   ├── enhanced_runner.py           # Production-scale generation runner
+│   ├── run_continuous.py            # Long-running / resumable generation
+│   ├── dataset_analyzer.py          # Dataset quality analysis
+│   ├── *_image_finder*.py           # CC background sourcing (Flickr, Openverse)
+│   ├── train_autoencoder.py         # Convolutional autoencoder (anomaly detection)
+│   ├── autoencoder_model/           # Trained autoencoder weights (TF variables)
+│   ├── defect_dataset/              # YOLO labels + data.yaml (4 classes)
+│   ├── source/                      # 3D can assets (FBX)
+│   ├── known_good_config.json       # Validated render configuration
+│   └── README_ENHANCED_SYSTEM.md    # Detailed pipeline documentation
+├── models/
+│   └── trained_model.zip            # Trained YOLO11s weights + training artifacts
+├── docs/images/                     # Sample training visualizations
+├── LICENSE
+└── README.md
 ```
 
-## 🛠️ Features
+Large generated datasets, HDRI files, and standalone model checkpoints are intentionally excluded from version control (see `.gitignore`).
 
-### Synthetic Data Generation
-- **Blender Integration**: Automated 3D scene generation
-- **Realistic Lighting**: HDRI-based environment lighting
-- **Texture Mapping**: Advanced material and texture application
-- **Defect Simulation**: Programmatic defect introduction
-- **Multi-angle Rendering**: Comprehensive viewpoint coverage
+## Trained model
 
-### Detection Systems
-- **YOLO Object Detection**: Real-time defect localization
-- **Autoencoder Anomaly Detection**: Unsupervised defect identification
-- **Hybrid Approach**: Combined detection for improved accuracy
-- **Multi-class Classification**: Support for various defect types
+`models/trained_model.zip` contains:
 
-### Data Pipeline
-- **Automated Dataset Creation**: End-to-end synthetic data generation
-- **Real Data Integration**: Seamless fusion with real inspection data
-- **Quality Validation**: Automated dataset quality assessment
-- **Continuous Learning**: Incremental model improvement
+- `my_model.pt` — Ultralytics YOLO11s detector weights from a single-class can-detection run
+- `train/args.yaml` — the full training configuration (YOLO11s, 20 epochs, 640 px images, batch 16, mosaic augmentation)
+- `train/train_batch*.jpg`, `train/labels.jpg` — training-batch mosaics and label-distribution plots
 
-## 🚀 Quick Start
+Label statistics from that run (roughly 900 annotated instances, uniformly distributed positions):
 
-### Prerequisites
+![Label distribution for the bundled training run](docs/images/labels.jpg)
+
+## Setup
+
+Prerequisites:
+
 - Python 3.8+
-- Blender 3.0+
-- CUDA-compatible GPU (recommended)
-- 16GB+ RAM
+- Blender 2.82+ available on `PATH` (rendering runs headless via `blender --background`)
+- A CUDA-capable GPU is recommended for rendering and training
 
-### Installation
+```bash
+git clone https://github.com/Janga786/CV-YOLO-Inspection.git
+cd CV-YOLO-Inspection/YOLO_2
+pip install ultralytics tensorflow opencv-python numpy matplotlib pandas pillow tqdm
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Janga786/Inspection-Computer-Vision.git
-   cd Inspection-Computer-Vision
-   ```
+Note: several scripts contain absolute paths from the original development machine (e.g., `/home/janga/YOLO_2/...` in `defect_dataset/data.yaml` and `train_autoencoder.py`). Update these to your local paths before running.
 
-2. **Install dependencies:**
-   ```bash
-   # For YOLO v1
-   cd YOLO
-   pip install -r requirements.txt
-   
-   # For Enhanced YOLO v2
-   cd ../YOLO_2
-   pip install opencv-python numpy torch torchvision matplotlib pillow
-   ```
+## Usage
 
-3. **Download Blender:**
-   - Install Blender 3.0+ from https://blender.org
-   - Add Blender to your system PATH
+Smoke-test the generation pipeline (renders a handful of images to verify model placement, textures, and labels):
 
-### Basic Usage
-
-#### Generate Synthetic Dataset
 ```bash
 cd YOLO_2
-python enhanced_generator.py --output_dir synthetic_dataset --num_images 1000
+python3 generate_dataset.py
 ```
 
-#### Train YOLO Model
+Run production-scale synthetic generation with quality monitoring:
+
 ```bash
-python train_yolo.py --data synthetic_dataset/data.yaml --epochs 100
+python3 enhanced_runner.py
 ```
 
-#### Run Inspection
+Analyze a generated dataset before training:
+
 ```bash
-python detect.py --source test_images/ --weights best.pt
+python3 dataset_analyzer.py <dataset_dir>
 ```
 
-## 📊 System Performance
+Train a detector on the generated data:
 
-### Detection Accuracy
-- **Precision**: 94.2%
-- **Recall**: 91.8%
-- **mAP@0.5**: 93.1%
-- **Inference Speed**: 45 FPS (RTX 3080)
-
-### Supported Defect Types
-- Surface scratches and dents
-- Color variations and staining
-- Shape deformations
-- Missing components
-- Contamination detection
-
-## 🔧 Configuration
-
-### Synthetic Generation Settings
 ```python
-# enhanced_generator.py configuration
-RENDER_SETTINGS = {
-    'resolution': (1920, 1080),
-    'samples': 128,
-    'lighting_mode': 'hdri',
-    'defect_probability': 0.3
-}
+from ultralytics import YOLO
+
+model = YOLO("yolo11s.pt")
+model.train(data="defect_dataset/data.yaml", epochs=20, imgsz=640, batch=16)
 ```
 
-### Model Training Parameters
-```yaml
-# data.yaml
-train: synthetic_dataset/images/train
-val: synthetic_dataset/images/val
-nc: 5  # number of classes
-names: ['good', 'scratch', 'dent', 'stain', 'deformation']
-```
+Run inference with the bundled weights:
 
-## 🎯 Use Cases
-
-### Industrial Inspection
-- Quality control in manufacturing
-- Automated defect detection
-- Production line integration
-- Statistical quality analysis
-
-### Research Applications
-- Synthetic data validation studies
-- Computer vision benchmarking
-- Domain adaptation research
-- Multi-modal learning experiments
-
-## 📈 Advanced Features
-
-### YOLO_2 Enhanced System
-- **Improved Architecture**: Latest YOLO variants integration
-- **Advanced Augmentation**: Sophisticated data augmentation techniques
-- **Transfer Learning**: Pre-trained model fine-tuning
-- **Ensemble Methods**: Multiple model combination strategies
-
-### Autoencoder Integration
-- **Anomaly Detection**: Unsupervised defect identification
-- **Feature Learning**: Automated feature extraction
-- **Dimensionality Reduction**: Efficient representation learning
-- **Reconstruction Analysis**: Detailed defect characterization
-
-## 🔬 Research Contributions
-
-This project demonstrates:
-- **Synthetic-to-Real Transfer**: Effective domain adaptation techniques
-- **Multi-modal Learning**: Integration of synthetic and real data
-- **Scalable Data Generation**: Automated large-scale dataset creation
-- **Industrial Applicability**: Real-world deployment considerations
-
-## 📚 Documentation
-
-- `YOLO_2/README_ENHANCED_SYSTEM.md` - Detailed system architecture
-- `yolo_cae/yolo_cae_anomaly_detection.ipynb` - Jupyter notebook tutorial
-- Model training logs and performance metrics
-- API documentation for integration
-
-## 🛠️ Development
-
-### Adding New Defect Types
-1. Create defect simulation in Blender scripts
-2. Update class definitions in configuration
-3. Generate training data with new defect types
-4. Retrain models with expanded dataset
-
-### Custom Model Integration
-1. Implement model class following existing patterns
-2. Add training and inference pipelines
-3. Update configuration files
-4. Test with validation datasets
-
-## 📊 Benchmarks
-
-### Dataset Statistics
-- **Synthetic Images**: 50,000+
-- **Real Images**: 5,000+
-- **Defect Categories**: 5 primary types
-- **Training Time**: ~4 hours (RTX 3080)
-
-### Comparison with Traditional Methods
-- **50% faster** than manual inspection
-- **20% higher** accuracy than rule-based systems
-- **95% reduction** in false positives
-- **Scalable** to new product types
-
-## 🔗 Integration
-
-### API Usage
 ```python
-from inspection_cv import InspectionModel
+from ultralytics import YOLO
 
-model = InspectionModel('best.pt')
-results = model.detect('product_image.jpg')
-print(f"Defects found: {results.defects}")
+model = YOLO("my_model.pt")  # extracted from models/trained_model.zip
+results = model.predict("path/to/image.jpg")
 ```
 
-### Batch Processing
+Train the autoencoder for anomaly detection (after updating `DATASET_PATH`):
+
 ```bash
-python batch_inspect.py --input_dir products/ --output_dir results/
+python3 train_autoencoder.py
 ```
 
-## 🏷️ Version History
+See `YOLO_2/README_ENHANCED_SYSTEM.md` for the full pipeline documentation, configuration options, and output structure.
 
-- **v2.0**: Enhanced YOLO implementation with autoencoder integration
-- **v1.0**: Basic YOLO implementation with synthetic data generation
+## Results
 
-## 📞 Support
+The repository ships the artifacts of a completed training run rather than claimed benchmark numbers: the trained YOLO11s weights, the exact training configuration, and the training-batch and label-distribution plots shown above. Rendering throughput during dataset generation was approximately 8 seconds per 1024x1024 image, and the pipeline has been exercised at the scale of several thousand images per dataset.
 
-For technical questions and contributions:
-- Review existing documentation
-- Check issue tracker for known problems
-- Submit detailed bug reports with reproducible examples
+## License
 
----
-
-**Note**: This system is designed for research and educational purposes. For production deployment, additional validation and testing are recommended.
+MIT — see [LICENSE](LICENSE).
