@@ -6,9 +6,9 @@ from tqdm import tqdm
 # The folder where you want to save the downloaded background images.
 DOWNLOAD_FOLDER = os.path.expanduser("~/YOLO_2/hdri_backgrounds")
 
-# --- IMPORTANT: PASTE YOUR PEXELS API KEY HERE ---
+# --- Set your Pexels API key in the PEXELS_API_KEY environment variable ---
 # Get your free key from: https://www.pexels.com/api/new/
-PEXELS_API_KEY = "NZVDUv6JNrJynNuyh2DhJAL14sEnx22ok29RnbiHzFz8qZeW9hUHHX22"
+PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "YOUR_API_KEY")
 
 # --- SEARCH PARAMETERS ---
 # A list of search terms to get a wide variety of backgrounds
@@ -57,7 +57,7 @@ def main():
     if PEXELS_API_KEY == "YOUR_API_KEY":
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print("!!! FATAL ERROR: Please paste your Pexels API key    !!!")
-        print("!!! into the PEXELS_API_KEY variable in the script.  !!!")
+        print("!!! in the PEXELS_API_KEY environment variable.    !!!")
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return
 
