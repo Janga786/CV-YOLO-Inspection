@@ -2,7 +2,7 @@
 
 ## Overview
 
-This enhanced system generates professional-quality synthetic training data for YOLO object detection models. It has been specifically optimized for Coca-Cola can defect detection with photorealistic rendering, advanced material systems, and comprehensive quality validation.
+This system generates synthetic training data for YOLO object detection, set up for Coca-Cola can defect detection: PBR materials, randomized lighting and camera, simulated defects, and automatic label and quality checks. It produces training data only; no detector trained on it is evaluated in this repository.
 
 ## System Components
 
@@ -10,7 +10,7 @@ This enhanced system generates professional-quality synthetic training data for 
 
 1. **enhanced_generator_v282.py** - Main generation engine (Blender 2.82 compatible)
    - Advanced PBR material system
-   - Professional lighting setup
+   - Three-point lighting setup
    - Intelligent camera positioning
    - Realistic defect simulation
    - Quality validation
@@ -28,46 +28,46 @@ This enhanced system generates professional-quality synthetic training data for 
    - Quality validation
    - Performance benchmarking
 
-4. **enhanced_runner.py** - Production-scale dataset generation
-   - Large-scale generation (5000+ images)
+4. **enhanced_runner.py** - Large batch dataset generation
+   - Batch generation (default target 5000 images)
    - Progress tracking
    - Quality monitoring
    - YOLO dataset organization
 
 ## Features Implemented
 
-### ✅ Advanced Material System
+### Advanced Material System
 - Full PBR workflow with all texture maps
 - Base Color, Normal, Metallic, Roughness textures
 - Procedural material variations
 - Enhanced surface properties
 
-### ✅ Realistic Defect Simulation
+### Realistic Defect Simulation
 - **Pristine**: Perfect can condition
 - **Scratches**: Surface roughness variations
 - **Dents**: Material darkening and texture changes
 - **Punctures**: Severe damage with material property changes
 - Configurable intensity levels
 
-### ✅ Professional Lighting
+### Lighting
 - Three-point lighting setup (Key, Fill, Rim)
 - Dynamic light intensity variations
 - Color temperature variations
 - HDRI environment support
 
-### ✅ Intelligent Camera System
+### Intelligent Camera System
 - Spherical coordinate positioning
 - Automatic can framing
 - Variable focal lengths (35-85mm)
 - Natural camera movements
 
-### ✅ Quality Validation
+### Quality Validation
 - Automatic bounding box validation
 - Image quality metrics (sharpness, contrast, noise)
 - Size and occlusion checks
 - Comprehensive quality reporting
 
-### ✅ Comprehensive Analysis
+### Comprehensive Analysis
 - Dataset distribution analysis
 - Quality metrics visualization
 - Label validation
@@ -86,13 +86,13 @@ This will:
 - Create analysis report
 - Show performance metrics
 
-### 2. Generate Production Dataset
+### 2. Generate a Full Dataset
 ```bash
 python3 enhanced_runner.py
 ```
 
 This will:
-- Generate 5000 high-quality images
+- Generate up to 5000 images (the default target)
 - Create train/val/test splits
 - Generate YOLO-ready dataset
 - Provide comprehensive analysis
@@ -148,24 +148,20 @@ The system tracks multiple quality indicators:
 - **Image Quality**: Sharpness, contrast, noise levels
 - **Bounding Boxes**: Size, position, accuracy
 - **Class Distribution**: Balanced defect representation
-- **Render Quality**: Professional lighting and materials
 
 ## Performance
 
-- **Generation Speed**: ~8 seconds per image (1024x1024)
-- **Quality**: Production-ready synthetic data
-- **Scale**: Tested up to 5000+ images
-- **Validation**: Comprehensive quality checks
+- **Generation speed**: about 8 seconds per 1024x1024 image on my machine (not logged in this repository)
 
 ## Training Integration
 
-The generated dataset is immediately ready for YOLO training:
+The generated dataset can be passed to Ultralytics YOLO for training:
 
 ```python
 from ultralytics import YOLO
 
 # Load model
-model = YOLO('yolov8s.pt')
+model = YOLO('yolo11s.pt')  # the bundled run used YOLO11s; yolov8s.pt also works
 
 # Train with enhanced dataset
 model.train(
@@ -187,20 +183,12 @@ model.train(
   - numpy
 - **Hardware**: GPU recommended for rendering
 
-## Key Improvements Over Original System
-
-1. **10x Better Quality**: Professional PBR materials and lighting
-2. **5x Faster Analysis**: Automated quality validation
-3. **100% YOLO Compatible**: Perfect label formatting
-4. **Comprehensive Metadata**: Full parameter tracking
-5. **Production Ready**: Scalable to thousands of images
-
 ## Usage Examples
 
-### Generate Custom Dataset
+### Generate a Dataset
 ```bash
-# Generate 1000 images with custom config
-python3 enhanced_runner.py --target=1000 --config=custom_config.json
+# Target count is set by target_total in enhanced_runner.py (default 5000)
+python3 enhanced_runner.py
 ```
 
 ### Analyze Existing Dataset
@@ -209,11 +197,6 @@ python3 enhanced_runner.py --target=1000 --config=custom_config.json
 python3 dataset_analyzer.py /path/to/dataset/
 ```
 
-### Test New Configuration
-```bash
-# Test with different settings
-python3 enhanced_test_runner.py --config=test_config.json
-```
 
 ## Troubleshooting
 
@@ -244,25 +227,3 @@ python3 enhanced_test_runner.py --config=test_config.json
    - Adjust camera positioning range
    - Check quality thresholds
    - Verify model scaling
-
-## Support
-
-For issues or improvements, check:
-1. Generated analysis reports
-2. Metadata files for parameter tracking
-3. Quality violation logs
-4. System performance metrics
-
-## Future Enhancements
-
-Planned improvements:
-- Real-time quality monitoring
-- Advanced defect simulation
-- Multi-object scenes
-- Automated parameter optimization
-- Cloud rendering support
-
----
-
-**Generated by Enhanced Synthetic Data Generator v2.0**  
-Compatible with Blender 2.82+ and YOLO v8+
