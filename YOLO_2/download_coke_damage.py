@@ -28,7 +28,7 @@ class DamagedCanDownloader:
             dir_path.mkdir(parents=True, exist_ok=True)
         
         # API keys (you'll need to add your own)
-        self.pexels_api_key = "NZVDUv6JNrJynNuyh2DhJAL14sEnx22ok29RnbiHzFz8qZeW9hUHHX22"  # Get from https://www.pexels.com/api/
+        self.pexels_api_key = os.environ.get("PEXELS_API_KEY", "YOUR_PEXELS_API_KEY")  # Get from https://www.pexels.com/api/
         
     def download_file(self, url, filepath, description=""):
         """Download a file with progress bar"""
