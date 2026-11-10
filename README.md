@@ -20,7 +20,7 @@ I built this in summer 2025 during my research assistantship with Dr. Kevin Wede
 ## Limits
 
 - All training data is synthetic. Nothing in this repository evaluates a model on real images.
-- No held-out metric is reported. Both configs that trained or would train a detector here validate on their training images (`YOLO_2/defect_dataset/data.yaml` points `train` and `val` at the same folder; the bundled run used the same setup as `robot_vision/dataset.yaml`). Any validation score stored in the bundled weights is not evidence of generalization.
+- No held-out metric is reported. Both configs that trained or would train a detector here validate on their training images (`YOLO_2/defect_dataset/data.yaml` points `train` and `val` at the same folder; the bundled run's Colab `data.yaml` is not included, so its validation split is unknown). Any validation score stored in the bundled weights is not evidence of generalization.
 - The bundled weights are the single-class yerba mate detector, not a defect detector. No trained weights for the 4-class defect dataset are included.
 - `YOLO_2/autoencoder_model/` holds the trained variables only (no `saved_model.pb`), and no autoencoder evaluation is included.
 
@@ -82,7 +82,7 @@ cd CV-YOLO-Inspection/YOLO_2
 pip install ultralytics tensorflow opencv-python numpy matplotlib pandas pillow tqdm
 ```
 
-Several scripts contain absolute paths from my original machine (for example `/home/janga/YOLO_2/...` in `defect_dataset/data.yaml` and `train_autoencoder.py`). Update them before running. The Pexels download scripts read the key from the `PEXELS_API_KEY` environment variable.
+Several scripts contain absolute paths from my original machine (for example `/home/janga/YOLO_2/...` in `defect_dataset/data.yaml` and `train_autoencoder.py`). Update them before running. The Pexels download scripts read the key from the `PEXELS_API_KEY` environment variable; set it first with `export PEXELS_API_KEY=<your key>`.
 
 ## Usage
 
